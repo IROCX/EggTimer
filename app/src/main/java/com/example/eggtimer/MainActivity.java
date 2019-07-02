@@ -1,11 +1,10 @@
 package com.example.eggtimer;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
@@ -15,6 +14,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 public class MainActivity extends AppCompatActivity {
     Integer time;
 
@@ -23,16 +24,26 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final CheckBox checkBox = findViewById(R.id.checkBox);
 
+        final CheckBox checkBox = findViewById(R.id.checkBox);
+        final TextView textView = findViewById(R.id.textView);
         final Button button = findViewById(R.id.button);
+        final EditText editText = findViewById(R.id.editText);
+
+        textView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return true;
+            }
+        });
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                final EditText editText = findViewById(R.id.editText);
+
                 String buttonText = button.getText().toString();
-                final TextView textView = findViewById(R.id.textView);
+
                 SeekBar seekBar = findViewById(R.id.seekBar);
 
                 if (buttonText.matches("start")) {
@@ -43,22 +54,23 @@ public class MainActivity extends AppCompatActivity {
                         time = Integer.parseInt(editText.getText().toString());
                         editText.onEditorAction(EditorInfo.IME_ACTION_DONE);
 
-                        seekBar.setMax(time);
-                        seekBar.setProgress(time);
+                        seekBar.setMax(time * 1000);
+                        seekBar.setProgress(time * 1000);
                         seekBar.animate().alpha(1f).setDuration(100);
 
                         button.animate().alpha(0f).setDuration(100);
                         editText.animate().alpha(0f).setDuration(100);
                         textView.animate().alpha(1f).setDuration(100);
                         textView.setText(time + "");
+                        textView.bringToFront();
 
-                        new CountDownTimer(time * 1000, 1000) {
+                        new CountDownTimer(time * 1000, 1) {
                             SeekBar seekBar = findViewById(R.id.seekBar);
                             TextView textView = findViewById(R.id.textView);
 
                             @Override
                             public void onTick(long l) {
-                                seekBar.setProgress((int)(l/1000));
+                                seekBar.setProgress((int) (l));
                                 textView.setText(String.format("%d", (int) l/1000));
                                 Log.i("TAG", "started");
                             }
@@ -83,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
                     seekBar.animate().alpha(0f).setDuration(100);
                     button.setText("start");
                     editText.setText("");
+                    editText.bringToFront();
                     editText.animate().alpha(1f).setDuration(100);
                     textView.animate().alpha(0f).setDuration(100);
                 }
